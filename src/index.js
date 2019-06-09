@@ -27,17 +27,16 @@ io.on('connection', (socket) => {
         }
         socket.join(user.roomID)
 
-        socket.emit('message', generateMessage(`Welcome ${user.displayName}!`))
-        socket.broadcast.to(user.roomID).emit('message', generateMessage(`${user.displayName} joined the chat`))
+        socket.emit('message', generateMessage(`Welcome ${user.displayName}!`), user.displayName)
+        socket.broadcast.to(user.roomID).emit('message', generateMessage(`${user.displayName} joined the chat`), user.displayName)
         io.to(user.roomID).emit('usersInChat', {
             roomID: user.roomID,
             users: getUsersInChat(user.roomID)
         })
 
         callback()
-        socket.on('sendMessage', (message, callback) => {
-
-            io.to(user.roomID).emit('message', generateMessage(filter.clean(message)), user.displayName)
+        socket.on('sendMessage', (message, username, callback) => {
+            io.to(user.roomID).emit('message', generateMessage(filter.clean(message)), username)
             callback()
         })
 
@@ -49,7 +48,7 @@ io.on('connection', (socket) => {
         socket.on('disconnect', () => {
             const user = removeUser(socket.id)
             if (user) {
-                io.to(user.roomID).emit('message', generateMessage(`${user.displayName} left the chat`))
+                io.to(user.roomID).emit('message', generateMessage(`${user.displayName} left the chat`, user.displayName))
                 io.to(user.roomID).emit('usersInChat', {
                     roomID: user.roomID,
                     users: getUsersInChat(user.roomID)

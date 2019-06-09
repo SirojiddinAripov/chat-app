@@ -35,8 +35,8 @@ const autoScroll = () => {
         message_area.scrollTop = message_area.scrollHeight
 }
 
-socket.on('message', (message, isProfane) => {
-    console.log(isProfane)
+socket.on('message', (message, username) => {
+    console.log(username)
     const html = Mustache.render(messageTemplate, {
         username,
         message: message.text,
@@ -81,7 +81,7 @@ document.querySelector('#send-message').addEventListener('submit', (e) => {
 
         return alert(`You can't send empty messages`)
     }
-    socket.emit('sendMessage', message, (err) => {
+    socket.emit('sendMessage', message, username, (err) => {
         if (err) {
             return alert(err)
         }
